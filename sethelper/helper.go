@@ -15,16 +15,47 @@ import (
 )
 
 // GetIndexOF
-func GetIndexOF(patt, array interface{}) (int, error) {
-	refPatt := reflect.ValueOf(patt)
-	refArray := reflect.ValueOf(array)
+func GetIndexOF(patt, items interface{}) (int, error) {
+	vpatt := reflect.ValueOf(patt)
+	vitems := reflect.ValueOf(items)
 
-	if refPatt.Type() != refArray.Type() {
-		return -1, fmt.Errorf("[error] wrong type! expect type array: %v, have type pattern: %v", refArray.String(), refPatt.String())
+	if vpatt.Type().Kind() != vitems.Type().Elem().Kind() {
+		return -1, fmt.Errorf("wrong type! expect type array: %v, got type pattern: %v", vitems.Type().String(), vpatt.Type().String())
+	}
+	if vitems.Type().Kind() != reflect.Slice && vitems.Type().Kind() != reflect.Array {
+		return -1, fmt.Errorf("arg not slice || array")
+	}
+	if vitems.Len() == 0 {
+		return -1, fmt.Errorf("array is empty")
 	}
 
-	return -1, nil
+	for i := 0; i < vitems.Len(); i++ {
+		if router(vpatt, vitems.Index(i)) {
+			return i, nil
+		}
+	}
+	return -1, fmt.Errorf("no element in array")
 }
+
+func router(patt, elem reflect.Value) bool {
+	switch elem.Kind() {
+	case reflect.Int64:
+		return patt.Int() == elem.Int()
+	case reflect.Float64:
+		return patt.Float() == elem.Float()
+	case reflect.String:
+		return patt.String() == elem.String()
+	}
+	return false
+}
+
+// func float64Compare(patt, elem reflect.Value) bool { return patt.Float() == elem.Float() }
+
+// func int64Compare(patt, elem reflect.Value) bool { return patt.Int() == elem.Int() }
+
+// func stringCompare(patt, elem reflect.Value) bool { return patt.String() == elem.String() }
+
+// func structCompare(patt, elem reflect.Value) bool { return string(patt.Bytes()) == string(elem.Bytes()) }
 
 // GenerateSecret
 func GenerateSecret(data string) (string, error) {

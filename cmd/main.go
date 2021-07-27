@@ -2,8 +2,7 @@ package main
 
 import (
 	"fmt"
-	"goset/dispatch"
-	"sync"
+	"goset/sethelper"
 	"time"
 )
 
@@ -12,18 +11,49 @@ import (
 // 	Runner2(a int64, b string, c float64)
 // }
 
-func main() {
-	wg := new(sync.WaitGroup)
-	// wg.Add(2)
-	dispatch.Dispatch(wg, Runner1, 12, "qwerty", 12.12)
-	dispatch.Dispatch(wg, Runner2, 34, "asdfgh")
-	wg.Wait()
+type Test struct {
+	A int
+	B string
+	T *Test
+}
 
-	// n, err := sethelper.GetIndexOF("wer", []string{"qwer", "wer", "tyu"})
-	// if err != nil {
-	// 	fmt.Printf("[error] %v\n", err)
+type MyTypeForCheck int64
+
+func main() {
+	// wg := new(sync.WaitGroup)
+	// // wg.Add(2)
+	// dispatch.Dispatch(wg, Runner1, 12, "qwerty", 12.12)
+	// dispatch.Dispatch(wg, Runner2, 34, "asdfgh")
+	// wg.Wait()
+
+	a := []MyTypeForCheck{1, 2, 3, 4, 5}
+	// b := []int{1, 2, 4}
+	var p MyTypeForCheck = 6
+	// A := &Test{}
+	// B := &Test{
+	// 	T: A,
 	// }
-	// fmt.Printf("[index] %v\n", n)
+	// A.T = B
+	// t1 := &Test{
+	// 	A: 1,
+	// 	B: "qwe",
+	// }
+	// t2 := &Test{
+	// 	A: 2,
+	// 	B: "asd",
+	// }
+	// A = append(A, t1, t2)
+
+	n, err := sethelper.GetIndexOF(p, a)
+	if err != nil {
+		fmt.Printf("[error] %v\n", err)
+	} else {
+		fmt.Printf("index = %v\n", n)
+	}
+
+	// if reflect.DeepEqual(a, a) {
+	// fmt.Println(true)
+	// }
 
 }
 
