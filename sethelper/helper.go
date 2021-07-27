@@ -39,9 +39,9 @@ func GetIndexOF(patt, items interface{}) (int, error) {
 
 func router(patt, elem reflect.Value) bool {
 	switch elem.Kind() {
-	case reflect.Int64:
+	case reflect.Int, reflect.Uint, reflect.Int16, reflect.Int32, reflect.Int64:
 		return patt.Int() == elem.Int()
-	case reflect.Float64:
+	case reflect.Float32, reflect.Float64:
 		return patt.Float() == elem.Float()
 	case reflect.String:
 		return patt.String() == elem.String()
