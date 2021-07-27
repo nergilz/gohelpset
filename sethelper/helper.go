@@ -19,7 +19,7 @@ func GetIndexOF(patt, items interface{}) (int, error) {
 	vpatt := reflect.ValueOf(patt)
 	vitems := reflect.ValueOf(items)
 
-	if vpatt.Type().Kind() != vitems.Type().Elem().Kind() {
+	if vitems.Type().Elem().Kind() != reflect.Interface && vpatt.Type().Kind() != vitems.Type().Elem().Kind() {
 		return -1, fmt.Errorf("wrong type! expect type array: %v, got type pattern: %v", vitems.Type().String(), vpatt.Type().String())
 	}
 	if vitems.Type().Kind() != reflect.Slice && vitems.Type().Kind() != reflect.Array {
@@ -27,6 +27,10 @@ func GetIndexOF(patt, items interface{}) (int, error) {
 	}
 	if vitems.Len() == 0 {
 		return -1, fmt.Errorf("array is empty")
+	}
+
+	for vpatt.Kind() == reflect.Interface {
+		vpatt = vpatt.Elem()
 	}
 
 	for i := 0; i < vitems.Len(); i++ {
@@ -38,24 +42,22 @@ func GetIndexOF(patt, items interface{}) (int, error) {
 }
 
 func router(patt, elem reflect.Value) bool {
-	switch elem.Kind() {
-	case reflect.Int, reflect.Uint, reflect.Int16, reflect.Int32, reflect.Int64:
+	switch p, e := patt.Kind(), elem.Kind(); {
+	case p == e && (e == reflect.Int || e == reflect.Int8 || e == reflect.Int16 || e == reflect.Int32 || e == reflect.Int64):
 		return patt.Int() == elem.Int()
-	case reflect.Float32, reflect.Float64:
+	case p == e && (e == reflect.Float32 || e == reflect.Float64):
 		return patt.Float() == elem.Float()
-	case reflect.String:
+	case p == e && e == reflect.String:
 		return patt.String() == elem.String()
+	case e == reflect.Interface:
+		return router(patt, elem.Elem())
+	case p == e && (e == reflect.Uint || e == reflect.Uint8 || e == reflect.Uint16 || e == reflect.Uint32 || e == reflect.Uint64):
+		return patt.Uint() == elem.Uint()
+	case p == e && e == reflect.Ptr:
+		return patt.Pointer() == elem.Pointer()
 	}
 	return false
 }
-
-// func float64Compare(patt, elem reflect.Value) bool { return patt.Float() == elem.Float() }
-
-// func int64Compare(patt, elem reflect.Value) bool { return patt.Int() == elem.Int() }
-
-// func stringCompare(patt, elem reflect.Value) bool { return patt.String() == elem.String() }
-
-// func structCompare(patt, elem reflect.Value) bool { return string(patt.Bytes()) == string(elem.Bytes()) }
 
 // GenerateSecret
 func GenerateSecret(data string) (string, error) {

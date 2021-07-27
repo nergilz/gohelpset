@@ -26,9 +26,12 @@ func main() {
 	// dispatch.Dispatch(wg, Runner2, 34, "asdfgh")
 	// wg.Wait()
 
-	a := []MyTypeForCheck{1, 2, 3, 4, 5}
+	// a := []MyTypeForCheck{1, 2, 3, 4, 5}
+	a := []interface{}{33, "eyert", 56.78}
+	p := 56.78
+
 	// b := []int{1, 2, 4}
-	var p MyTypeForCheck = 6
+	// var p MyTypeForCheck = 6
 	// A := &Test{}
 	// B := &Test{
 	// 	T: A,
